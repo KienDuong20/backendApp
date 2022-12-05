@@ -1,8 +1,9 @@
 import { app } from "./app.js";
-import { config } from "dotenv";
+import pkg from "dotenv";
 import { connectDatabase } from "./config/database.js";
 import cloudinary from "cloudinary";
 
+const { config } = pkg;
 config({
   path: "./config/config.env",
 });

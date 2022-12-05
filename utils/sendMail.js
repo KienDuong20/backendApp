@@ -1,6 +1,8 @@
-import { createTransport } from "nodemailer";
+import pkg from "nodemailer";
 
 export const sendMail = async (email, subject, text) => {
+  const { createTransport } = pkg;
+
   const transport = createTransport({
     service: "gmail",
     name: "example.com",
