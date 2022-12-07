@@ -6,9 +6,7 @@ import fs from "fs";
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-
-    const avatar = req.files.avatar.tempFilePath;
+    const { name, email, password, avatar } = req.body;
 
     let user = await User.findOne({ email });
 
@@ -20,18 +18,11 @@ export const register = async (req, res) => {
 
     const otp = Math.floor(Math.random() * 1000000);
 
-    const mycloud = await cloudinary.v2.uploader.upload(avatar);
-
-    fs.rmSync("./tmp", { recursive: true });
-
     user = await User.create({
       name,
       email,
       password,
-      avatar: {
-        public_id: mycloud.public_id,
-        url: mycloud.secure_url,
-      },
+      avatar,
       otp,
       otp_expiry: new Date(Date.now() + process.env.OTP_EXPIRE * 60 * 1000),
     });
@@ -195,22 +186,10 @@ export const updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
-    const { name } = req.body;
-    const avatar = req.files.avatar.tempFilePath;
+    const { name, avatar } = req.body;
 
     if (name) user.name = name;
-    if (avatar) {
-      await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-
-      const mycloud = await cloudinary.v2.uploader.upload(avatar);
-
-      fs.rmSync("./tmp", { recursive: true });
-
-      user.avatar = {
-        public_id: mycloud.public_id,
-        url: mycloud.secure_url,
-      };
-    }
+    if (avatar) user.avatar = avatar;
 
     await user.save();
 
