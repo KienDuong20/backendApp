@@ -13,6 +13,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  token: {
+    type: String,
+    required: false,
+    unique: true,
+  },
 
   password: {
     type: String,
@@ -61,7 +66,8 @@ userSchema.pre("save", async function (next) {
 
 userSchema.methods.getJWTToken = function () {
   return jwt.sign({ _id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000,
+    // expiresIn: process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000,
+    expiresIn: "365d",
   });
 };
 

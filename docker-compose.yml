@@ -23,6 +23,8 @@ services:
     command: sh -c "npm install -g nodemon && npm install && npm run dev "
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/node_modules
+
     environment:
       PORT: 4000
       MONGO_URI: mongodb://mongo_db:27017

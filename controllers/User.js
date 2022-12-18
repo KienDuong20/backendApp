@@ -7,7 +7,6 @@ import fs from "fs";
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
     const avatar = req.files.avatar.tempFilePath;
 
     let user = await User.findOne({ email });
@@ -165,11 +164,11 @@ export const updateTask = async (req, res) => {
 
     const user = await User.findById(req.user._id);
 
-    user.task = user.tasks.find(
+    user.tasks = user.tasks.find(
       (task) => task._id.toString() === taskId.toString()
     );
 
-    user.task.completed = !user.task.completed;
+    user.tasks.completed = !user.tasks.completed;
 
     await user.save();
 
@@ -182,11 +181,13 @@ export const updateTask = async (req, res) => {
 };
 
 export const getMyProfile = async (req, res) => {
+  console.log("abcd");
   try {
+    console.log(req.user._id);
     const user = await User.findById(req.user._id);
-
     sendToken(res, user, 201, `Welcome back ${user.name}`);
   } catch (error) {
+    console.log("ee", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

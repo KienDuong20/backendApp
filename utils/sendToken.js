@@ -1,11 +1,9 @@
 export const sendToken = (res, user, statusCode, message) => {
   const token = user.getJWTToken();
-
+  console.log("check token", token);
   const options = {
     httpOnly: true,
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-    ),
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 99999999),
   };
 
   const userData = {
@@ -15,6 +13,7 @@ export const sendToken = (res, user, statusCode, message) => {
     avatar: user.avatar,
     tasks: user.tasks,
     verified: user.verified,
+    token: token,
   };
 
   res
