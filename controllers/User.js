@@ -8,7 +8,7 @@ export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const avatar = req.files.avatar.tempFilePath;
-
+    console.log("bbb", req.files.avatar);
     let user = await User.findOne({ email });
 
     if (user) {
@@ -20,7 +20,6 @@ export const register = async (req, res) => {
     const otp = Math.floor(Math.random() * 1000000);
 
     const mycloud = await cloudinary.v2.uploader.upload(avatar);
-
     fs.rmSync("./tmp", { recursive: true });
 
     user = await User.create({
@@ -36,7 +35,6 @@ export const register = async (req, res) => {
     });
 
     await sendMail(email, "Verify your account", `Your OTP is ${otp}`);
-
     sendToken(
       res,
       user,
@@ -119,6 +117,7 @@ export const logout = async (req, res) => {
 
 export const addTask = async (req, res) => {
   try {
+    console.log("req", req.user);
     const { title, description } = req.body;
 
     const user = await User.findById(req.user._id);
@@ -161,15 +160,14 @@ export const removeTask = async (req, res) => {
 export const updateTask = async (req, res) => {
   try {
     const { taskId } = req.params;
-
     const user = await User.findById(req.user._id);
 
-    user.tasks = user.tasks.find(
+    user.task = user.tasks.find(
       (task) => task._id.toString() === taskId.toString()
     );
+    user.task.completed = !user.task.completed;
 
-    user.tasks.completed = !user.tasks.completed;
-
+    // console.log("user.tasks.completed ", !user.tasks.completed);
     await user.save();
 
     res
@@ -181,7 +179,6 @@ export const updateTask = async (req, res) => {
 };
 
 export const getMyProfile = async (req, res) => {
-  console.log("abcd");
   try {
     console.log(req.user._id);
     const user = await User.findById(req.user._id);
@@ -195,23 +192,23 @@ export const getMyProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-
+    // console.log("yseee", req);
     const { name } = req.body;
+
     const avatar = req.files.avatar.tempFilePath;
-
     if (name) user.name = name;
-    if (avatar) {
-      await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+    // if (avatar) {
+    await cloudinary.v2.uploader.destroy(user.avatar.public_id);
 
-      const mycloud = await cloudinary.v2.uploader.upload(avatar);
+    const mycloud = await cloudinary.v2.uploader.upload(avatar);
 
-      fs.rmSync("./tmp", { recursive: true });
+    fs.rmSync("./tmp", { recursive: true });
 
-      user.avatar = {
-        public_id: mycloud.public_id,
-        url: mycloud.secure_url,
-      };
-    }
+    user.avatar = {
+      public_id: mycloud.public_id,
+      url: mycloud.secure_url,
+    };
+    // }
 
     await user.save();
 
